@@ -71,11 +71,9 @@
 (defvar $sktl-cat nil)
 
 (defun sktl-get-transcoder-path (from to cat)
-  (cl-destructuring-bind (from1 . to-spec)
-      (assoc from cat)
-    (cl-destructuring-bind (to1 path)
-	(assoc to to-spec)
-      path)))
+  (let ((to-spec (cdr (assoc from cat))))
+    (when to-spec
+      (cadr (assoc to to-spec)))))
 
 (defun sktl--snarf-xml-file (path)
   (with-temp-buffer
