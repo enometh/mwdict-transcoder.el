@@ -240,3 +240,27 @@
 	       (sktl--decode-next fsm string :start start :end end))
 	     (mapc 'write-char out))))
 
+(defvar $fsm-cache (list nil))
+
+(defun sktl-file-write-date (file)
+  (file-attribute-modification-time (file-attributes file)))
+
+(cl-defun sktl-cached-fsm (from to &key (cat $sktl-cat)
+				(fsm-cache $fsm-cache)
+				reload-if-newer reload)
+  (let* ((key (cons from to))
+	 (ent (cl-assoc key (cdr fsm-cache) :test #'equal)))
+    (if (and ent (not reload))
+	(cadr ent)
+      (let* ((path (sktl-get-transcoder-specs from to cat))
+	     (tmp-xml (sktl--snarf-xml-file path))
+	     (fsm (sktl--compile-entries tmp-xml)))
+	(if ent
+	    (setf (cadr ent) fsm)
+	  (prog1 fsm
+	    (setq ent (list key fsm))
+	    (setf (cdr fsm-cache)
+		  (push ent (cdr fsm-cache)))))))))
+
+(defun sktl-decode-string (string from to)
+  (sktl-decode (sktl-cached-fsm from to) string))
