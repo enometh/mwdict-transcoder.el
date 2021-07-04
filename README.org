@@ -15,3 +15,6 @@ https://github.com/funderburkjim/sanskrit-transcoding/tree/master/transcoder
 (sktl-process-string "rAmaH gacCati" :slp1 :deva)
 (sktl-process-string "rAmaH gacCati" :slp1 :roman)
 #+END_SRC
+
+** =M-x mwdict-convert=
+Prompt for TO and FROM encodings and convert the active region.
