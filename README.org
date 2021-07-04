@@ -14,5 +14,5 @@ https://github.com/funderburkjim/sanskrit-transcoding/tree/master/transcoder
 (setq $tmp-xml (sktl--snarf-xml-file
 		(sktl-get-transcoder-specs :slp1 :deva $sktl-cat)))
 (setq $fsm (sktl--compile-entries $tmp-xml))
-(apply #'string (sktl-decode $fsm "rAmaH gacCati"))
+(sktl-decode $fsm "rAmaH gacCati")
 #+END_SRC

@@ -232,9 +232,11 @@
 	(cl-values (list (elt string start)) (1+ start))))))
 
 (cl-defun sktl-decode (fsm string &key (start 0) (end (length string)))
-  (cl-loop initially (setf (fsm-state fsm) (fsm-start-state fsm))
-	   with out
-	   while (< start end) do
-	   (cl-multiple-value-setq (out start)
-	     (sktl--decode-next fsm string :start start :end end))
-	   append out))
+  (with-output-to-string
+    (cl-loop initially (setf (fsm-state fsm) (fsm-start-state fsm))
+	     with out
+	     while (< start end) do
+	     (cl-multiple-value-setq (out start)
+	       (sktl--decode-next fsm string :start start :end end))
+	     (mapc 'write-char out))))
+
