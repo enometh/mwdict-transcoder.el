@@ -1,0 +1,18 @@
+#+COMMENT: -*- Org -*-
+
+* mwdict-transcoder.el
+
+Transliterate between various sanskrit encodings using the FSM XML
+data from
+https://github.com/funderburkjim/sanskrit-transcoding/tree/master/transcoder
+
+** Usage
+#+BEGIN_SRC elisp
+(defvar $sktl-transcoder-data-dir
+  "~/extern/EXT-SKT/sanskrit-transcoding/transcoder/")
+(setq $sktl-cat (sktl-buildcat $sktl-transcoder-data-dir))
+(setq $tmp-xml (sktl--snarf-xml-file
+		(sktl-get-transcoder-specs :slp1 :deva $sktl-cat)))
+(setq $fsm (sktl--compile-entries $tmp-xml))
+(apply #'string (sktl-decode $fsm "rAmaH gacCati"))
+#+END_SRC
