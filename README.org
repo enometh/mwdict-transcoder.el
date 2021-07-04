@@ -11,8 +11,6 @@ https://github.com/funderburkjim/sanskrit-transcoding/tree/master/transcoder
 (defvar $sktl-transcoder-data-dir
   "~/extern/EXT-SKT/sanskrit-transcoding/transcoder/")
 (setq $sktl-cat (sktl-buildcat $sktl-transcoder-data-dir))
-(setq $tmp-xml (sktl--snarf-xml-file
-		(sktl-get-transcoder-specs :slp1 :deva $sktl-cat)))
-(setq $fsm (sktl--compile-entries $tmp-xml))
-(sktl-decode $fsm "rAmaH gacCati")
+(sktl-fsm-start-state (sktl-cached-fsm :slp1 :deva :reload t))
+(sktl-process-string "rAmaH gacCati" :slp1 :deva)
 #+END_SRC

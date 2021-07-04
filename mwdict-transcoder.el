@@ -70,7 +70,7 @@
 
 (defvar $sktl-cat nil)
 
-(defun sktl-get-transcoder-specs (from to cat)
+(defun sktl-get-transcoder-path (from to cat)
   (cl-destructuring-bind (from1 . to-spec)
       (assoc from cat)
     (cl-destructuring-bind (to1 path)
@@ -177,7 +177,7 @@
 ;;; madhu 101017: just interpret the fsm for now; Generating code is
 ;;; no win.
 ;;;
-(cl-defstruct fsm state start-state state-table inputdecoding outputencoding)
+(cl-defstruct sktl-fsm state start-state state-table inputdecoding outputencoding)
 
 (cl-defun sktl--compile-entries (ents &aux ret)
   (cl-destructuring-bind (fsm1 fsm1-attribs . fsm1-rest)
@@ -213,46 +213,47 @@
 		    (cond (value (sktl--trie-set trie in value))
 			  (t (warn "Skipping empty OUT/NEXT for IN %s." in)))))))
 	  (warn "skipping entry %s" e1))))
-    (make-fsm :start-state (sktl--keywordify (cdr (assoc 'start fsm1-attribs)))
-	      :inputdecoding (cdr (assoc 'inputencoding fsm1-attribs))
-	      :outputencoding(cdr (assoc 'outputencoding fsm1-attribs))
-	      :state-table ret)))
+    (make-sktl-fsm
+     :start-state (sktl--keywordify (cdr (assoc 'start fsm1-attribs)))
+     :inputdecoding (cdr (assoc 'inputencoding fsm1-attribs))
+     :outputencoding(cdr (assoc 'outputencoding fsm1-attribs))
+     :state-table ret)))
 
-(cl-defun sktl--decode-next (fsm string &key (start 0) (end (length string)))
-  (unless (fsm-state fsm)
-    (setf (fsm-state fsm) (fsm-start-state fsm)))
-  (let ((trie (cdr (assoc (fsm-state fsm) (fsm-state-table fsm)))))
-    (cl-assert trie nil "No trie for state %s." (fsm-state fsm))
+(cl-defun sktl--process-next (fsm string &key (start 0) (end (length string)))
+  (unless (sktl-fsm-state fsm)
+    (setf (sktl-fsm-state fsm) (sktl-fsm-start-state fsm)))
+  (let ((trie (cdr (assoc (sktl-fsm-state fsm) (sktl-fsm-state-table fsm)))))
+    (cl-assert trie nil "No trie for state %s." (sktl-fsm-state fsm))
     (cl-multiple-value-bind (retval pos)
 	(sktl--find-seq string trie :start start :end end)
       (if retval
 	  (cl-destructuring-bind (out next) retval
-	    (when next (setf (fsm-state fsm) next))
+	    (when next (setf (sktl-fsm-state fsm) next))
 	    (cl-values out pos))
 	(cl-values (list (elt string start)) (1+ start))))))
 
-(cl-defun sktl-decode (fsm string &key (start 0) (end (length string)))
+(cl-defun sktl-process (fsm string &key (start 0) (end (length string)))
   (with-output-to-string
-    (cl-loop initially (setf (fsm-state fsm) (fsm-start-state fsm))
+    (cl-loop initially (setf (sktl-fsm-state fsm) (sktl-fsm-start-state fsm))
 	     with out
 	     while (< start end) do
 	     (cl-multiple-value-setq (out start)
-	       (sktl--decode-next fsm string :start start :end end))
+	       (sktl--process-next fsm string :start start :end end))
 	     (mapc 'write-char out))))
 
-(defvar $fsm-cache (list nil))
+(defvar $sktl-fsm-cache (list nil))
 
 (defun sktl-file-write-date (file)
   (file-attribute-modification-time (file-attributes file)))
 
 (cl-defun sktl-cached-fsm (from to &key (cat $sktl-cat)
-				(fsm-cache $fsm-cache)
+				(fsm-cache $sktl-fsm-cache)
 				reload-if-newer reload)
   (let* ((key (cons from to))
 	 (ent (cl-assoc key (cdr fsm-cache) :test #'equal)))
     (if (and ent (not reload))
 	(cadr ent)
-      (let* ((path (sktl-get-transcoder-specs from to cat))
+      (let* ((path (sktl-get-transcoder-path from to cat))
 	     (tmp-xml (sktl--snarf-xml-file path))
 	     (fsm (sktl--compile-entries tmp-xml)))
 	(if ent
@@ -262,5 +263,5 @@
 	    (setf (cdr fsm-cache)
 		  (push ent (cdr fsm-cache)))))))))
 
-(defun sktl-decode-string (string from to)
-  (sktl-decode (sktl-cached-fsm from to) string))
+(defun sktl-process-string (string from to)
+  (sktl-process (sktl-cached-fsm from to) string))
