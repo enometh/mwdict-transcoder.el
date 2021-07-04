@@ -263,5 +263,19 @@
 	    (setf (cdr fsm-cache)
 		  (push ent (cdr fsm-cache)))))))))
 
-(defun sktl-process-string (string from to)
-  (sktl-process (sktl-cached-fsm from to) string))
+(cl-defun sktl-process-string (string from to &key
+				      (cat $sktl-cat)
+				      (fsm-cache $sktl-fsm-cache))
+  "Uses `$sktl-fsm-cache' to cache FSMs. Ensure that `$skt-cat' is initialized
+via `sktl-buildcat' before calling this function."
+  (if (eql from to)
+      string
+    (if (sktl-get-transcoder-path from to cat)
+	(sktl-process (sktl-cached-fsm from to :cat cat :fsm-cache fsm-cache)
+		      string)
+      (let ((ret (sktl-process (sktl-cached-fsm from :slp1
+						:cat cat :fsm-cache fsm-cache)
+			       string)))
+	(sktl-process (sktl-cached-fsm :slp1 to
+				       :cat cat :fsm-cache fsm-cache)
+		      ret)))))

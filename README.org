@@ -13,4 +13,5 @@ https://github.com/funderburkjim/sanskrit-transcoding/tree/master/transcoder
 (setq $sktl-cat (sktl-buildcat $sktl-transcoder-data-dir))
 (sktl-fsm-start-state (sktl-cached-fsm :slp1 :deva :reload t))
 (sktl-process-string "rAmaH gacCati" :slp1 :deva)
+(sktl-process-string "rAmaH gacCati" :slp1 :roman)
 #+END_SRC
