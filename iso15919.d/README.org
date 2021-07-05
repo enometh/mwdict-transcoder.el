@@ -16,12 +16,27 @@ it doesn't have lring, uring. It has ldot rdot instead
 - a/ indicates a-acute. a^ indicates a-circumflex. a\ indicates
   a-grave. Unfortunately In the context of ISO-15919 These do not
   refer to the phonetics but to orthography.
-** CONVERT 
+** CONVERT
 
 Do we want to create a direct transcoder from :iso15919 to :roman
 which converts lring uring to ldot udot and handles uppercase. accents
 will be normalised to what :roman expects
 
+
+** Test Usage
+#+BEGIN_SRC elisp
+(sktl--add-to-cat $sktl-cat :iso15991 :slp1
+		  (concat default-directory
+			  "iso15991_slp1.xml"))
+(sktl--add-to-cat $sktl-cat :slp1 :iso15991
+		  (concat default-directory
+			  "slp1_iso15991.xml"))
+
+(setq $v0 "(AVŚ_1,1.2a) púnar éhi vacas pate devéna mánasā sahá |")
+(sktl-process-string $v0 :iso15991 :roman)
+(sktl-process-string $v0 :iso15991 :deva)
+
+#+END_SRC
 
 
 
