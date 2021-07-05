@@ -1,0 +1,27 @@
+#+COMMENT: -*-Org-*-
+* mwdict-transcoder/iso15919.d
+
+ISO-15919 Unicode Roman <-> funderbunk-transcoder ROMAN
+
+** NOTES ON UPSTREAM (20210705)
+AS OF 201210705 on the upstream sanskrit-transcoders fsm xml data
+files seem to have these peculiarities -
+
+*** ROMAN is basically IAST
+it doesn't have lring, uring. It has ldot rdot instead
+*** ROMAN doesn't support uppercase characters.
+*** SLP1 accent peculiaries
+- SLP1 accents are postfix. (I think they were prefix in
+  sanskrit-sqlite)
+- a/ indicates a-acute. a^ indicates a-circumflex. a\ indicates
+  a-grave. Unfortunately In the context of ISO-15919 These do not
+  refer to the phonetics but to orthography.
+** CONVERT 
+
+Do we want to create a direct transcoder from :iso15919 to :roman
+which converts lring uring to ldot udot and handles uppercase. accents
+will be normalised to what :roman expects
+
+
+
+
