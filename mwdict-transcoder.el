@@ -48,7 +48,9 @@
 	bogus-cons))))
 
 (defun sktl-buildcat (dir)
-  (cl-loop with froms finally (return froms)
+  "Create a catalog of transcoders from fsm xml files in directory `dir'"
+  (cl-loop with froms = (sktl--make-cat)
+	   finally (return froms)
 	   for pathname in (directory-files
 			     (file-name-as-directory dir)
 			     'full-path
@@ -61,17 +63,13 @@
 	   do (warn "Skipping %s." pathname)
 	   else do
 	   (let* ((from (sktl--keywordify (cl-subseq name 0 pos)))
-		  (to (sktl--keywordify (cl-subseq name (1+ pos) (- len 4))))
-		  (from-cons (or (assoc from froms)
-				 (car (push (list from) froms))))
-		  (bogus-cons (assoc to (cdr from-cons))))
-	     (cl-assert (null bogus-cons))
-	     (push (list to pathname) (cdr from-cons)))))
+		  (to (sktl--keywordify (cl-subseq name (1+ pos) (- len 4)))))
+	     (sktl--add-to-cat froms from to pathname))))
 
 (defvar $sktl-cat nil)
 
 (defun sktl-get-transcoder-path (from to cat)
-  (let ((to-spec (cdr (assoc from cat))))
+  (let ((to-spec (cdr (assoc from (cdr cat)))))
     (when to-spec
       (cadr (assoc to to-spec)))))
 
