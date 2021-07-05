@@ -1,0 +1,96 @@
+#+COMMENT: -*-Mode: Org; coding:utf-8-unix; -*-
+#+TITLE: Gretil ISO-15919
+#+AUTHOR: 
+#+DATE: 
+#+LATEX_COMPILER: xelatex
+#+LATEX_CLASS_OPTIONS: [a4paper, 11pt]
+#+LATEX_HEADER: \usepackage{polyglossia}
+#+LATEX_HEADER: \usepackage{fontspec}
+#+LATEX_HEADER_EXTRA: \setmainlanguage{english}
+#+LATEX_HEADER_EXTRA: \setmainfont{Sans}
+
+#+HTML_HEAD: <!-- Copyright (C) 2018-2021 Madhu. All Rights Reserved. -->
+#+LANGUAGE: en
+#+OPTIONS: toc:nil ':t num:nil ^:nil *:t
+#+BIND: org-ignore-plain-lists-p t
+#+BIND: org-footnote-section nil
+#+BIND: org-html-postamble nil
+#+BIND: org-html-head-include-default-style t
+#+BIND: org-html-head-include-scripts nil
+#+BIND: org-html-preamble-format (("en" "<div class=\"title\"><h3 class=\"author\">%a</h3><p class=\"imprint\">%d</p></div>"))
+
+#+COMMENT: <!-- <tr><td>description:|multibyte sequence:</td></tr> -->
+
+#+COMMENT: #+ATTR_LATEX: :align ll
+#+COMMENT: #+ATTR_HTML: :border 2 :rules all :frame border
+#+COMMENT: | description | multibyte sequence |
+#+COMMENT: |-------------+--------------------|
+#+COMMENT: | /           |  <>                |
+
+
+** Vowels
+#+ATTR_LATEX: :align ll
+| long a         | ā |
+| long A         | Ā |
+| long i         | ī |
+| long I         | Ī |
+| long u         | ū |
+| long U         | Ū |
+| vocalic r      | r̥ |
+| vocalic R      | R̥ |
+| long vocalic r | r̥̄ |
+| vocalic l      | l̥ |
+| long vocalic l | l̥̄ |
+
+** Consonants
+#+ATTR_LATEX: :align ll
+| velar n                | ṅ |
+| velar N                | Ṅ |
+| palatal n              | ñ |
+| palatal N              | Ñ |
+| retroflex t            | ṭ |
+| retroflex T            | Ṭ |
+| retroflex d            | ḍ |
+| retroflex d, intervoc. | ḷ |
+| retroflex D            | Ḍ |
+| retroflex n            | ṇ |
+| retroflex N            | Ṇ |
+| palatal s              | ś |
+| palatal S              | Ś |
+| retroflex s            | ṣ |
+| retroflex S            | Ṣ |
+| anusvara               | ṃ |
+| visarga                | ḥ |
+
+** Accents
+#+ATTR_LATEX: :align ll
+| a udatta               | á       |
+| a svarita              | à       |
+| long a udatta          | ā́       |
+| long a svarita         | ā̀       |
+| i udatta               | í       |
+| i svarita              | ì       |
+| long i udatta          | ī́       |
+| long i svarita         | ī̀       |
+| u udatta               | ú       |
+| u svarita              | ù       |
+| long u udatta          | ū́       |
+| long u svarita         | ū̀       |
+| voc. r udatta          | ŕ̥       |
+| voc. r  svarita        | r̥̀       |
+| long voc. r udatta     | r̥̄́       |
+
+
+| vocalic l udatta       | ĺ̥       |
+| vocalic l svarita      | l̥̀       |
+| long vocalic l udatta  | l̥̄́       |
+| long vocalic l svarita | l̥̄̀       |
+
+
+| e udatta               | é       |
+| e svarita              | è       |
+| o udatta               | ó       |
+| o svarita              | ò       |
+| accented ai =          | aí / aì |
+| accented au =          | aú / aù |
+

@@ -1,0 +1,71 @@
+#+COMMENT: -*- Mode: Org; coding: utf-8-unix; -*-
+#+TITLE: SLP1 text
+#+AUTHOR: 
+#+DATE: 
+#+LATEX_COMPILER: xelatex
+#+LATEX_CLASS_OPTIONS: [a4paper, 11pt]
+#+LATEX_HEADER: \usepackage{polyglossia}
+#+LATEX_HEADER: \usepackage{fontspec}
+#+LATEX_HEADER_EXTRA: \setmainlanguage{sanskrit}
+#+LATEX_HEADER_EXTRA: \setmainfont[script=Devanagari]{Shobhika}
+
+
+#+HTML_HEAD: <!-- Copyright (C) 2018-2020 Madhu. All Rights Reserved. -->
+#+LANGUAGE: en
+#+OPTIONS: toc:nil ':t num:nil ^:nil *:t
+#+BIND: org-ignore-plain-lists-p t
+#+BIND: org-footnote-section nil
+#+BIND: org-html-postamble nil
+#+BIND: org-html-head-include-default-style t
+#+BIND: org-html-head-include-scripts nil
+#+BIND: org-html-preamble-format (("en" "<div class=\"title\"><h3 class=\"author\">%a</h3><p class=\"imprint\">%d</p></div>"))
+
+
+* Vowels
+| अ | आ | इ | ई | उ | ऊ | ए | ऐ  | ओ | औ  |
+| a | ā | i | ī | u | ū | e | ai | o | au |
+| a | A | i | I | u | U | e | E  | o | O  |
+
+* Sonorants
+| ऋ | ॠ | ऌ | ॡ |
+| ṛ | ṝ | ḷ | ḹ |
+| f | F | x | X |
+
+* Anusvāra/Visarga
+| अं | अः |
+| M | H  |
+
+* Consonants
+| क | ख | ग | घ  | ङ | Velar      |
+| k | kh | g | gh | ṅ |            |
+| k | K  | g | G  | N |            |
+|   |    |   |    |   |            |
+| च | छ  | ज | झ  | ञ | Palatal    |
+| c | ch | j | jh | ñ |            |
+| c | C  | j | J  | Y |            |
+|   |    |   |    |   |            |
+| ट | ठ  | ड | ढ  | ण | Retroflex  |
+| ṭ | ṭh | ḍ | ḍh | ṇ |            |
+| w | W  | q | Q  | R |            |
+|   |    |   |    |   |            |
+| त | थ  | द | ध  | न | Dental     |
+| t | th | d | dh | n |            |
+| t | T  | d | D  | n |            |
+|   |    |   |    |   |            |
+| प | फ | ब | भ  | म | Labial     |
+| p | ph | b | bh | m |            |
+| p | P  | b | B  | m |            |
+|   |    |   |    |   |            |
+| य | र  | ल | व  |   | Semi-vowel |
+| y | r  | l | v  |   |            |
+| y | r  | l | v  |   |            |
+|   |    |   |    |   |            |
+| श | ष  | स | ह  |   | Fricative  |
+| ś | ṣ  | s | h  |   |            |
+| S | z  | s | h  |   |            |
+
+* Vedic accents (ALL LIES!)
+
+| Udatta      | / | high pitch   ACUTE                       |
+| anudatta[1] | \ | low pitch[1] GRAVE (independent svarita) |
+| svarita     | ^ | circumflex                               |
