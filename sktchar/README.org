@@ -1,0 +1,17 @@
+
+* mwdict-transcoder/sktchar
+
+** sktchar-base.el
+Experimental symbolic list processing - represent sanskrit characters
+lisp symbols.
+
+** sktchar-sandhi.el
+Implement sandhi rules on sktchar symbols.
+
+#+BEGIN_SRC emacs
+(progn
+(load "sktchar-base")
+(load "sktchar-sandhi")
+)
+#+END_SRC
+
