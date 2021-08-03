@@ -129,14 +129,14 @@
 (defun sktl--make-trie () (cons nil nil))
 
 (cl-defun sktl--trie-set (trie key &optional (val t))
-  (if (null key)
+  (if (seq-empty-p key)
       (setf (car trie) val)		;TODO *warn-on-overwrite*
-    (if (or (atom (car key)) (cl-endp (cdr trie)))
-	(let ((sub-trie (cdr (assoc (car key) (cdr trie)))))
+    (if (or (atom (seq-first key)) (cl-endp (cdr trie)))
+	(let ((sub-trie (cdr (assoc (seq-first key) (cdr trie)))))
 	  (unless sub-trie
 	    (setq sub-trie (sktl--make-trie))
-	    (push (cons (car key) sub-trie) (cdr trie)))
-	  (sktl--trie-set sub-trie (cdr key) val))
+	    (push (cons (seq-first key) sub-trie) (cdr trie)))
+	  (sktl--trie-set sub-trie (seq-rest key) val))
       (let ((last-cons (last (cdr trie))))
 	(cl-assert last-cons)
 	(cl-assert (eql (car (car key)) :not))
