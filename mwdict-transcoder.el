@@ -302,3 +302,120 @@ with corresponding text encoded in `to'.  Ensure `$skt-cat' is initialized via
       (delete-region beginning end)
       (goto-char beginning)
       (insert replacement))))
+
+
+
+;;; ----------------------------------------------------------------------
+;;;
+;;; additions to sktl-trie for the non-exceptional case
+;;;
+
+(defun sktl--trie-value (trie) (car trie))
+
+(defun sktl--trie-sub-tries (trie) (mapcar 'cdr (cdr trie)))
+
+(defun sktl--trie-descend (trie sub-key)
+  (let ((cons (assoc sub-key (cdr trie))))
+    (when cons (cdr cons))))
+
+(defun sktl--gettrie (key trie &optional default)
+  (seq-map (lambda (subkey)
+	     (when trie
+	       (setq trie (cdr (assoc subkey (cdr trie))))))
+	   key)
+  (if trie
+      (car trie)
+    default))
+
+(gv-define-setter sktl--gettrie (value key trie &optional _default)
+  `(sktl--trie-set ,trie ,key ,value))
+
+
+;;; ----------------------------------------------------------------------
+;;;
+;;; segmenter
+;;;
+
+(defun sktl--single-match-failer (_tok _revtoks solutions)
+  (and solutions t))
+
+(defun sktl--strategy-linear (new-resumptions resumptions)
+  (setq resumptions (nconc new-resumptions resumptions)) ;XXX
+  (let ((last (last resumptions 1)))
+    (and last (cons (car last) (cl-ldiff resumptions last)))))
+
+;; FAIL (TOK REVTOKS SOLUTIONS) => T prunes branch
+;; STRATEGY (NEW-RESUMPTIONS RESUMPTIONS) => combined resumptions
+
+(cl-defun sktl--segment-string (string trie &key (start 0) (end (length string)) fail junk-allowed-p strategy)
+  (cl-block nil
+    (let ((resumptions (list (cons start nil))) p sub-trie output solutions
+	  parsed-word new-resumptions)
+      (cl-tagbody
+       cont
+	 (when new-resumptions
+	   (setq resumptions
+		 (if strategy
+		     (funcall strategy new-resumptions resumptions)
+		   (nreconc new-resumptions resumptions)))
+	   (setq new-resumptions nil))
+	 (cond ((cl-endp resumptions) (cl-return (nreverse solutions)))
+	       (t (cl-destructuring-bind (start1 . output1) (pop resumptions)
+		    (setq output output1 start start1))
+		  (setq p start sub-trie trie)))
+       loop
+	 (cl-assert (< p end) nil "Start index %S > end index %S." start end)
+	 (cond ((setq sub-trie (sktl--trie-descend sub-trie (aref string p)))
+		(setq parsed-word (sktl--trie-value sub-trie))
+		(when (not parsed-word)
+		  (cond ((= (1+ p) end) ; fail at end-of-input
+			 (go cont))
+			(t (cl-incf p) (go loop))))
+		(cl-assert parsed-word)
+		(if (or (not fail)
+			(not (funcall fail parsed-word output solutions)))
+		    (cond ((= (1+ p) end)
+			   (push (reverse (cons parsed-word output)) solutions)
+			   (go cont))
+			  ;; choice-point
+			  ((sktl--trie-sub-tries sub-trie)
+			   (push (cons (1+ p) (cons parsed-word output))
+				 new-resumptions)
+			   (cl-incf p) (go loop))
+			  ;; next word
+			  (t (push parsed-word output)
+			     (setq sub-trie trie start (1+ p))
+			     (cl-incf p) (go loop)))
+		  (go cont)))
+	       ;; fail at end-of-input
+	       ((= (1+ p) end)
+		(when junk-allowed-p
+		  (push (reverse (cons (cl-subseq string start (1+ p)) output))
+			solutions))
+		(go cont))
+	       ;; fail at end-of-trie
+	       (t (when junk-allowed-p
+		    (push (cons (1+ p)
+				(cons (cl-subseq string start (1+ p)) output))
+			  resumptions))
+		  (go cont)))))))
+
+(when nil
+(defvar $test (sktl--make-trie))
+(progn (setf (sktl--gettrie "abc" $test) 'abc)
+       (setf (sktl--gettrie "a" $test) 'a)
+       (setf (sktl--gettrie "b" $test) 'b)
+       (setf (sktl--gettrie "ab" $test) 'ab))
+(sktl--segment-string "aaabca" $test :junk-allowed-p nil)
+(length (car (sktl--segment-string "aabcabcabaabc" $test :junk-allowed-p nil)))
+(length (cadr (sktl--segment-string "aabcabcabaabc" $test)))
+(sktl--segment-string "d" $test)
+(sktl--segment-string "dadaabc" $test :junk-allowed-p t)
+(sktl--segment-string "abab" $test
+		:fail
+		(lambda (tok revtoks solutions)
+		  (cond (solutions
+			 (warn "MATCH: %s sol=%s" (reverse (cons tok revtoks))
+			       solutions)
+			 nil)))))
+
