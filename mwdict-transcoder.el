@@ -276,11 +276,12 @@ via `sktl-buildcat' before calling this function."
 				       :cat cat :fsm-cache fsm-cache)
 		      ret)))))
 
-(cl-defun mwdict-convert (from to &optional beginning end list1 from1)
+(cl-defun mwdict-convert (from to &optional beginning end)
   "Replace region between `beginning' and `end' which has text encoded in `from'
 with corresponding text encoded in `to'.  Ensure `$skt-cat' is initialized via
 `sktl-buildcat' before calling this function."
   (interactive
+   (let ( list1 from1 )
    (list (setq from1 (intern-soft
 		      (completing-read "From "
 				       (setq list1
@@ -291,7 +292,7 @@ with corresponding text encoded in `to'.  Ensure `$skt-cat' is initialized via
 					       (remove from1 list1))
 				       nil t))
 	 (region-beginning)
-	 (region-end)))
+	 (region-end))))
   (unless beginning (setq beginning (region-beginning)))
   (unless end (setq end (region-end)))
   (let ((replacement (sktl-process-string
