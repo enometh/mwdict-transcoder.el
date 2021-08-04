@@ -8,10 +8,14 @@ lisp symbols.
 ** sktchar-sandhi.el
 Implement sandhi rules on sktchar symbols.
 
-#+BEGIN_SRC emacs
+** sktchar-slp1.el
+Tokenize slp1 to a sktchar stream
+
+#+BEGIN_SRC emacs-lisp
 (progn
-(load "sktchar-base")
-(load "sktchar-sandhi")
+(load "sktchar-base.el")
+(load "sktchar-sandhi.el")
+(load "sktchar-slp1.el")
 )
 #+END_SRC
 
