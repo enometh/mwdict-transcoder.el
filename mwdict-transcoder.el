@@ -299,7 +299,7 @@ with corresponding text encoded in `to'.  Ensure `$skt-cat' is initialized via
 		      (buffer-substring-no-properties beginning end)
 		      from
 		      to)))
-    (save-excursion
+    (progn
       (delete-region beginning end)
       (goto-char beginning)
       (insert replacement))))
