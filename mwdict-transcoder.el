@@ -199,15 +199,8 @@
 				   (let ((x (sktl--make-trie)))
 				     (push (cons state x) ret)
 				     x)))
-			 (value (if (and out next)
-				    (list out next)
-				  (if out
-				      (list out nil)
-				    (if next
-					(list nil next)
-				      nil)))))
-		    (cond (value (sktl--trie-set trie in value))
-			  (t (warn "Skipping empty OUT/NEXT for IN %s." in)))))))
+			 (value (list out next)))
+		    (sktl--trie-set trie in value)))))
 	  (warn "skipping entry %s" e1))))
     (make-sktl-fsm
      :start-state (sktl--keywordify (cdr (assoc 'start fsm1-attribs)))
