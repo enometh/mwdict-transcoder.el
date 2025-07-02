@@ -173,7 +173,7 @@
 ;;; madhu 101017: just interpret the fsm for now; Generating code is
 ;;; no win.
 ;;;
-(cl-defstruct sktl-fsm state start-state state-table inputdecoding outputencoding)
+(cl-defstruct sktl-fsm state start-state state-table inputdecoding outputencoding from to)
 
 (cl-defun sktl--compile-entries (ents &aux ret)
   (cl-destructuring-bind (fsm1 fsm1-attribs . fsm1-rest)
@@ -252,6 +252,8 @@
       (let* ((path (sktl-get-transcoder-path from to cat))
 	     (tmp-xml (sktl--snarf-xml-file path))
 	     (fsm (sktl--compile-entries tmp-xml)))
+	(setf (sktl-fsm-from fsm) from)
+	(setf (sktl-fsm-to fsm) to)
 	(if ent
 	    (setf (cadr ent) fsm)
 	  (prog1 fsm
