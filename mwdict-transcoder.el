@@ -83,6 +83,15 @@
 ;;;
 ;;;
 ;;;
+(defvar $sktl-vowel-signs-slp1
+  (cdadr (sktl--parse-string "g/^([^aAiIuUfFxXeEoO^\\/\\\\])")))
+
+(defvar $sktl-vowel-signs-unicode
+  (mapcar (lambda (s)
+	    (let ((ret (sktl--parse-string s)))
+	      (cl-assert (cl-endp (cdr ret)))
+	      (car ret)))
+	  '("\\u094d" "\\u093e" "\\u093f" "\\u0940" "\\u0941" "\\u0942" "\\u0943" "\\u0944" "\\u0962" "\\u0963" "\\u0947" "\\u0948" "\\u094b" "\\u094c")))
 
 (defun sktl--parse-states (s)
   (split-string s "," t "\t\n\r "))
@@ -107,12 +116,18 @@
 				     for curr = (elt string idx)
 				     if (eql prev ?\\) collect curr
 				     else unless (eql curr ?\\) collect curr))))
+	  ;; /^
+	  ((and (< (+ start 1) end)
+		(eql (elt string start) ?\/)
+		(eql (elt string (1+ start)) ?^)) ; not (list ?\^ )
+	   (list (cons :not $sktl-vowel-signs-unicode )))
 	  (t (cons (elt string start)
 		   (sktl--parse-string string :start (1+ start) :end end))))))
 
 (when nil
   (sktl--parse-string "\\u0938\\u094d")
-  (sktl--parse-string "s\\u0938/^([^aAiIuUfFxXeEoO^/\\\\])"))
+  (sktl--parse-string "s\\u0938/^([^aAiIuUfFxXeEoO^/\\\\])")
+  (sktl--parse-string "\\u0915/^"))
 
 
 ;;; ----------------------------------------------------------------------
@@ -149,23 +164,31 @@
 		     (cl-pushnew x (cdr sub-key)))))
 	  (sktl--trie-set sub-trie (cdr key) val))))))
 
+
+(cl-defun sktl--find-negation-cons (alists)
+  (cl-member-if (lambda (elt)
+		  (and (consp elt)
+		       (and (consp (car elt)) (eql (car (car elt)) :not))))
+		alists))
+
 (cl-defun sktl--find-seq (seq trie &key (start 0) (end (length seq)))
   (when (< start end)
-    (let (x retval retidx foundp)
+    (let (x retval retidx foundp cl c d)
       (when (setq x (assoc (elt seq start) (cdr trie)))
-	(when (cdr x) ;; x = (sub-key . sub-trie)
-	  (cl-multiple-value-setq (retval retidx foundp)
-	    (sktl--find-seq seq (cdr x) :start (1+ start) :end end))))
-      (cond (foundp (cl-values retval retidx foundp))
-	    ((and x (car (cdr x)))
-	     (cl-assert (not (consp (car x))))
-	     (cl-values (car (cdr x)) (1+ start) t))
-	    ((setq x (car (last (cdr (member x trie)))))
-	     (cl-destructuring-bind (sub-key . sub-trie) x
-	       (when (consp sub-key)
-		 (cl-assert (eql (car sub-key) :not))
-		 (unless (cl-find (elt seq start) (cdr sub-key))
-		   (cl-values (car sub-trie) start t)))))))))
+	(setq cl (sktl--find-negation-cons (cdr x)))
+	(setq c (car cl))
+	(setq d (cl-ldiff (cdr x) cl))
+	(if (cdr d) ;; x = (sub-key . sub-trie)
+	    (cl-multiple-value-setq (retval retidx foundp)
+	      (sktl--find-seq seq d :start (1+ start) :end end))
+	  (if (and c
+		   (or (= (1+ start) end)
+		       (not (cl-find (elt seq (1+ start)) (cdr (car c))))))
+	      (setq foundp t retval (car (cdr c)) retidx (1+ start))))
+      (if foundp (cl-values retval retidx foundp)
+	(when (and x (car (cdr x)))
+	  (cl-assert (not (consp (car x))))
+	  (cl-values (car (cdr x)) (1+ start) t)))))))
 
 
 ;;; ----------------------------------------------------------------------
