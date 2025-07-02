@@ -211,8 +211,8 @@
 	  (warn "skipping entry %s" e1))))
     (make-sktl-fsm
      :start-state (sktl--keywordify (cdr (assoc 'start fsm1-attribs)))
-     :inputdecoding (cdr (assoc 'inputencoding fsm1-attribs))
-     :outputencoding(cdr (assoc 'outputencoding fsm1-attribs))
+     :inputdecoding (cdr (assoc 'inputDecoding fsm1-attribs))
+     :outputencoding(cdr (assoc 'outputEncoding fsm1-attribs))
      :state-table ret)))
 
 (cl-defun sktl--process-next (fsm string &key (start 0) (end (length string)))
