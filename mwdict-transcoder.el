@@ -135,7 +135,8 @@
 ;;; TRIE WITH NEGATION
 ;;;
 ;;; TRIE: (VAL . ALIST)         |  ALIST: (SUB-KEY . SUB-TRIE)+
-;;; KEY: SUB-KEY+               |  SUB-KEY: ATOM | (:NOT ATOM+)
+;;; KEY: SUB-KEY+               |
+;;; SUB-TRIE: (VAL [ ALIST ]  [ ((:NOT SUB-KEYS) VAL) ])
 ;;;
 ;;; TRIE-SET will merge `NOT'-ATOMS in the SUB-KEY of the LAST element
 ;;; of ALIST, and overwrite any values.  FIND-SEQ will DFS for
@@ -346,8 +347,26 @@ with corresponding text encoded in `to'.  Ensure `$skt-cat' is initialized via
       (car trie)
     default))
 
+(defun sktl--deltrie (trie key)
+  (if (null key)
+      (prog1 (car trie) (setf (car trie) nil))
+    (let ((sub-trie (sktl--trie-descend trie (car key))))
+      (when sub-trie
+	(prog1 (sktl--deltrie sub-trie (cdr key))
+	  (setf (cdr trie)
+		(cl-delete sub-trie (cdr trie) :test #'eql :key #'cdr)))))))
+
+(cl-defun sktl--settrie (trie key &optional (val t))
+  (if (null key)
+      (setf (car trie) val)
+    (let ((sub-trie (sktl--trie-descend trie (car key))))
+      (unless sub-trie
+	(setq sub-trie (cons nil nil))
+	(push (cons (car key) sub-trie) (cdr trie)))
+      (sktl--settrie sub-trie (cdr key) val))))
+
 (gv-define-setter sktl--gettrie (value key trie &optional _default)
-  `(sktl--trie-set ,trie ,key ,value))
+  `(sktl--settrie ,trie ,key ,value))
 
 
 ;;; ----------------------------------------------------------------------
